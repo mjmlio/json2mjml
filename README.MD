@@ -1,8 +1,8 @@
-# MJML2JSON
+# JSON2MJML
 
 ## Purpose
 
-Converts a MJML template from an `XML` syntax to a valid `JSON` syntax.
+Converts a MJML template from a `JSON` syntax to a valid `XML` syntax.
 
 ## Installation
 
@@ -12,6 +12,12 @@ Optional: if you get an error like `command not found: babel-node` when running 
 
 ## Usage
 
-Input and output filenames must be set, both with their extensions. Use the `-s` optional argument to stringify the output (and make it compatible with the [MJML API](https://mjml.io/api)).
+Input and output filenames must be set, both with their extensions.
 
 `babel-node mjml2json.js input output [-s]`
+
+You can run a test on the provided styleguide with `npm run test`.
+
+## MJML2JSON
+
+If you need to convert a MJML template from a `XML` syntax to a valid `JSON` syntax, check [MJML2JSON](https://github.com/ngarnier/mjml2json).

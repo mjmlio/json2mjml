@@ -4,14 +4,14 @@
   "description": "",
   "main": "mjml2json.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "babel-node json2mjml.js ./tests/styleguide.json ./tests/styleguide.mjml"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Nicolas Garnier",
+  "license": "MIT",
   "dependencies": {
     "htmlparser2": "^3.9.2",
-    "mjml": "^3.2.2",
+    "mjml": "^3.3.5",
     "lodash": "^4.17.2"
   },
   "devDependencies": {

@@ -1,158 +1,36 @@
-import _ from 'lodash'
-import htmlparser from 'htmlparser2'
+const indentPad = n => Array(n + 1).join(' ')
 
-import './libs/mjml'
-import MJMLElements from 'mjml-core/lib/MJMLElementsCollection'
-
-const CDATASections = []
-const MJElements = []
-
-_.forEach({
-  ...MJMLElements,
-}, (element, name) => {
-  const tagName = element.tagName || name
-
-  if (element.endingTag) {
-    CDATASections.push(tagName)
-  }
-
-  MJElements.push(tagName)
-})
-
-function cleanNode (node) {
-  delete node.parent
-
-  // delete children if needed
-  if (node.children.length) {
-    node.children.forEach(cleanNode)
-  } else {
-    delete node.children
-  }
-
-  // delete attributes if needed
-  if (Object.keys(node.attributes).length === 0) {
-    delete node.attributes
-  }
+const TAG_CONVERSION = {
+  'mj-dev': 'mj-raw',
 }
 
-/**
- * Avoid htmlparser to parse ending tags
- */
-function addCDATASection (content) {
-  const regexTag = tag => new RegExp(`<${tag}([^>\/]*)>([^]*?)</${tag}>`, 'gmi')
-  const replaceTag = tag => `<${tag}$1><![CDATA[$2]]></${tag}>`
+const lineAttributes = attrs =>
+  Object.keys(attrs)
+    .filter(key => key !== 'passport')
+    .map(key => `${key}="${attrs[key]}"`)
+    .sort()
+    .join(' ')
 
-  _.forEach(CDATASections, tag => {
-    content = content.replace(regexTag(tag), replaceTag(tag))
-  })
+export default function json2xml(node, indent = 0) {
+  let { tagName } = node
+  const { children, content, attributes } = node
 
-  return content
-}
-
-function parseAttributes (content) {
-  const regexTag = tag => new RegExp(`<${tag}(\\s("[^"]*"|'[^']*'|[^'">])*)?>`, 'gmi')
-  const regexAttributes = /(\S+)\s*?=\s*([\'"])(.*?|)\2/gmi
-
-  _.forEach(MJElements, tag => {
-    content = content.replace(regexTag(tag), contentTag => (
-      contentTag.replace(regexAttributes, (match, attr, around, value) => `${attr}=${around}${encodeURIComponent(value)}${around}`)
-    ))
-  })
-
-  return content
-}
-
-
-/**
- * Convert "true" and "false" string attributes values
- * to corresponding Booleans
- */
-function convertBooleansOnAttrs (attrs) {
-  return _.mapValues(attrs, val => {
-    if (val === 'true') { return true }
-    if (val === 'false') { return false }
-    return val
-  })
-}
-
-function setEmptyAttributes (node) {
-  if (!node.attributes) {
-    node.attributes = {}
-  }
-  if (node.children) {
-    node.children.forEach(setEmptyAttributes)
-  }
-}
-
-export default function parseMjml (xml, {
-  addEmptyAttributes = true,
-  convertBooleans = true,
-} = {}) {
-
-  if (!xml) { return null }
-
-  let safeXml = xml
-
-  safeXml = parseAttributes(safeXml)
-  safeXml = addCDATASection(safeXml)
-
-  let mjml = null
-  let cur = null
-
-  const parser = new htmlparser.Parser({
-    onopentag: (name, attrs) => {
-      attrs = _.mapValues(attrs, val => decodeURIComponent(val))
-
-      if (convertBooleans) {
-        // "true" and "false" will be converted to bools
-        attrs = convertBooleansOnAttrs(attrs)
-      }
-
-      const newNode = {
-        parent: cur,
-        tagName: name,
-        attributes: attrs,
-        children: [],
-      }
-
-      if (cur) {
-        cur.children.push(newNode)
-      } else {
-        mjml = newNode
-      }
-
-      cur = newNode
-    },
-    onclosetag: () => {
-      cur = (cur && cur.parent) || null
-    },
-    ontext: text => {
-      if (!text) { return }
-
-      const val = `${((cur && cur.content) || '')}${text}`.trim()
-
-      if (val) {
-        cur.content = val.replace('$', '&#36;') // prevent issue with $ sign in MJML
-      }
-    },
-  }, {
-    xmlMode: true,
-  })
-
-  parser.write(safeXml)
-  parser.end()
-
-  if (!_.isObject(mjml)) {
-    throw new Error('Parsing failed. Check your mjml.')
+  if (tagName in TAG_CONVERSION) {
+    tagName = TAG_CONVERSION[tagName]
   }
 
-  cleanNode(mjml)
+  const space = indentPad(indent)
 
-  // assign "attributes" property if not set
-  if (addEmptyAttributes) {
-    setEmptyAttributes(mjml)
+  let attrs = (attributes && ` ${lineAttributes(attributes)}`) || ''
+
+  if (!attrs.trim()) {
+    attrs = ''
   }
 
-  return mjml
-  
+  const inside =
+    (content && `\n${space}  ${content}\n${space}`) ||
+    (children && `\n${children.map(c => `${json2xml(c, indent + 2)}`).join('\n')}\n${space}`) ||
+    ''
+
+  return `${space}<${tagName}${attrs}>${inside}</${tagName}>`
 }
