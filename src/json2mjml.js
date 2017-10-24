@@ -16,7 +16,7 @@ export default function json2xml(node, indent = 0) {
   const { children, content, attributes } = node
 
   if (tagName in TAG_CONVERSION) {
-    tagName = TAG_CONVERSION[tagName]
+    tagName = TAG_CONVERSION[tagName] // eslint-disable-line prefer-destructuring
   }
 
   const space = indentPad(indent)
