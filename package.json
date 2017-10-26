@@ -6,7 +6,8 @@
   "scripts": {
     "build": "babel src -d lib",
     "lint": "eslint src test",
-    "prettier": "prettier --write \"{src,test}/**/*.js\""
+    "prettier": "prettier --write \"{src,test}/**/*.js\"",
+    "test": "jest test/"
   },
   "keywords": [],
   "author": "Nicolas Garnier",
@@ -26,6 +27,7 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.6.0",
     "eslint-plugin-import": "^2.8.0",
+    "jest": "^21.2.1",
     "prettier": "^1.7.4"
   }
 }
