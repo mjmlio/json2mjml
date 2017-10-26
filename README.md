@@ -39,7 +39,7 @@ const input = {
     // ... your mjml
   ]
 }
-const output = mjml2json(input)
+const output = json2mjml(input)
 
 console.log(output)
 ```
