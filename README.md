@@ -7,11 +7,11 @@ Converts a [MJML](https://github.com/mjmlio/mjml) template from JSON to XML.
 ## Installation
 
 ```bash
-yarn add mjml2json
+yarn add json2mjml
 
 # or
 
-npm i mjml2json
+npm i json2mjml
 ```
 
 ## Usage
