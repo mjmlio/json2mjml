@@ -1,17 +1,19 @@
 {
   "name": "mjml2json",
   "version": "1.0.0",
-  "description": "",
-  "main": "mjml2json.js",
+  "description": "A package to convert a MJML template from JSON to XML",
+  "main": "lib/json2mjml.js",
+  "bin": {
+    "json2mjml": "lib/cli.js"
+  },
   "scripts": {
     "build": "babel src -d lib",
     "lint": "eslint src test",
     "prettier": "prettier --write \"{src,test}/**/*.js\"",
     "test": "jest test/"
   },
-  "keywords": [],
-  "author": "Nicolas Garnier",
   "license": "MIT",
+  "author": "Nicolas Garnier",
   "dependencies": {
     "commander": "^2.11.0",
     "htmlparser2": "^3.9.2",
